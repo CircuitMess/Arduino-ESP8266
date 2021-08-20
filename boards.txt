@@ -222,7 +222,7 @@ nibble.bootloader.tool.firmware=nibble/nibble-v1.0.0.bin
 
 batctrl.name=BatController
 batctrl.build.board=ESP8266_BATCTRL
-batctrl.build.variant=nibble
+batctrl.build.variant=batctrl
 batctrl.upload.tool=esptool
 batctrl.upload.maximum_data_size=81920
 batctrl.upload.wait_for_upload_port=false
