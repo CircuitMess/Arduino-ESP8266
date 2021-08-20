@@ -37,6 +37,10 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #endif
 #define LED_BUILTIN_AUX 16
 
+#ifndef PIN_A0
+#define PIN_A0 (17)
+#endif /* PIN_A0 */
+
 static const uint8_t D0   = 16;
 static const uint8_t D1   = 5;
 static const uint8_t D2   = 4;
