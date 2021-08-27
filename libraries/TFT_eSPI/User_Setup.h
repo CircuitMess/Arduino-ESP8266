@@ -36,7 +36,7 @@
 //#define RPI_DISPLAY_TYPE // 20MHz maximum SPI
 
 // Only define one driver, the other ones must be commented out
-// #define ILI9341_DRIVER
+//#define ILI9341_DRIVER
 //#define ST7735_DRIVER      // Define additional parameters below for this display
 //#define ILI9163_DRIVER     // Define additional parameters below for this display
 //#define S6D02A1_DRIVER
@@ -50,6 +50,9 @@
 //#define R61581_DRIVER
 //#define RM68140_DRIVER
 //#define ST7796_DRIVER
+//#define SSD1963_480_DRIVER    // Untested
+//#define SSD1963_800_DRIVER    // Untested
+//#define SSD1963_800ALT_DRIVER // Untested
 
 // Some displays support SPI reads via the MISO pin, other displays have a single
 // bi-directional SDA pin and the library will try to read this via the MOSI line.
@@ -57,7 +60,7 @@
 
 // #define TFT_SDA_READ      // This option is for ESP32 ONLY, tested with ST7789 display only
 
-// For ST7789 and ILI9341 ONLY, define the colour order IF the blue and red are swapped on your display
+// For ST7735, ST7789 and ILI9341 ONLY, define the colour order IF the blue and red are swapped on your display
 // Try ONE option at a time to find the correct colour order for your display
 
 //  #define TFT_RGB_ORDER TFT_RGB  // Colour order Red-Green-Blue
@@ -150,10 +153,12 @@
 // ###### EDIT THE PIN NUMBERS IN THE LINES FOLLOWING TO SUIT YOUR ESP8266 SETUP ######
 
 // For NodeMCU - use pin numbers in the form PIN_Dx where Dx is the NodeMCU pin designation
-// #define TFT_CS   -1
-// #define TFT_DC   2  // Data Command control pin
-// #define TFT_RST  PIN_D4  // Reset pin (could connect to NodeMCU RST, see next line)
-// #define TFT_RST  -1  // Set TFT_RST to -1 if the display RESET is connected to NodeMCU RST or 3.3V
+//#define TFT_MISO -1
+//#define TFT_MOSI 25 // 23 // 16
+//#define TFT_SCLK  26 // 18 // 19 // 17
+//#define TFT_CS   2 // 4 // 12   // Chip select control pin
+//#define TFT_DC    4 // 0 // 4  // Data Command control pin
+//#define TFT_RST   13 // 2  // Reset pin (could connect to RST pin)
 
 //#define TFT_BL PIN_D1  // LED back-light (only for ST7789 with backlight control pin)
 
@@ -275,12 +280,12 @@
 
 #define LOAD_GLCD   // Font 1. Original Adafruit 8 pixel font needs ~1820 bytes in FLASH
 #define LOAD_FONT2  // Font 2. Small 16 pixel high font, needs ~3534 bytes in FLASH, 96 characters
-// #define LOAD_FONT4  // Font 4. Medium 26 pixel high font, needs ~5848 bytes in FLASH, 96 characters
-// #define LOAD_FONT6  // Font 6. Large 48 pixel font, needs ~2666 bytes in FLASH, only characters 1234567890:-.apm
-// #define LOAD_FONT7  // Font 7. 7 segment 48 pixel font, needs ~2438 bytes in FLASH, only characters 1234567890:-.
-// #define LOAD_FONT8  // Font 8. Large 75 pixel font needs ~3256 bytes in FLASH, only characters 1234567890:-.
+//#define LOAD_FONT4  // Font 4. Medium 26 pixel high font, needs ~5848 bytes in FLASH, 96 characters
+//#define LOAD_FONT6  // Font 6. Large 48 pixel font, needs ~2666 bytes in FLASH, only characters 1234567890:-.apm
+//#define LOAD_FONT7  // Font 7. 7 segment 48 pixel font, needs ~2438 bytes in FLASH, only characters 1234567890:-.
+//#define LOAD_FONT8  // Font 8. Large 75 pixel font needs ~3256 bytes in FLASH, only characters 1234567890:-.
 //#define LOAD_FONT8N // Font 8. Alternative to Font 8 above, slightly narrower, so 3 digits fit a 160 pixel TFT
-#define LOAD_GFXFF  // FreeFonts. Include access to the 48 Adafruit_GFX free fonts FF1 to FF48 and custom fonts
+//#define LOAD_GFXFF  // FreeFonts. Include access to the 48 Adafruit_GFX free fonts FF1 to FF48 and custom fonts
 
 // Comment out the #define below to stop the SPIFFS filing system and smooth font code being loaded
 // this will save ~20kbytes of FLASH
@@ -299,7 +304,7 @@
 // With a ST7735 display more than 27MHz may not work (spurious pixels and lines)
 // With an ILI9163 display 27 MHz works OK.
 
-// #define SPI_FREQUENCY   1000000
+//#define SPI_FREQUENCY   1000000
 // #define SPI_FREQUENCY   5000000
 // #define SPI_FREQUENCY  10000000
 // #define SPI_FREQUENCY  20000000
