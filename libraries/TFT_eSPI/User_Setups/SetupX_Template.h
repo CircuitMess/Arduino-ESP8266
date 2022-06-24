@@ -8,7 +8,6 @@
 //   run without the need to make any more changes for a particular hardware setup!
 //   Note that some sketches are designed for a particular TFT pixel width/height
 
-
 // ##################################################################################
 //
 // Section 1. Call up the right driver file and any options for it
@@ -23,13 +22,7 @@
 //#define NUCLEO_64_TFT
 //#define NUCLEO_144_TFT
 
-// STM32 8 bit parallel only:
-// If STN32 Port A or B pins 0-7 are used for 8 bit parallel data bus bits 0-7
-// then this will improve rendering performance by a factor of ~8x
-//#define STM_PORTA_DATA_BUS
-//#define STM_PORTB_DATA_BUS
-
-// Tell the library to use 8 bit parallel mode (otherwise SPI is assumed)
+// Tell the library to use 8 bit parallel mode(otherwise SPI is assumed)
 //#define TFT_PARALLEL_8_BIT
 
 // Display type -  only define if RPi display
@@ -40,7 +33,6 @@
 //#define ST7735_DRIVER      // Define additional parameters below for this display
 //#define ILI9163_DRIVER     // Define additional parameters below for this display
 //#define S6D02A1_DRIVER
-//#define RPI_ILI9486_DRIVER // 20MHz maximum SPI
 //#define HX8357D_DRIVER
 //#define ILI9481_DRIVER
 //#define ILI9486_DRIVER
@@ -50,19 +42,14 @@
 //#define R61581_DRIVER
 //#define RM68140_DRIVER
 //#define ST7796_DRIVER
-//#define SSD1963_480_DRIVER
-//#define SSD1963_800_DRIVER
-//#define SSD1963_800ALT_DRIVER
-//#define ILI9225_DRIVER
-//#define GC9A01_DRIVER
 
 // Some displays support SPI reads via the MISO pin, other displays have a single
 // bi-directional SDA pin and the library will try to read this via the MOSI line.
 // To use the SDA line for reading data from the TFT uncomment the following line:
 
-// #define TFT_SDA_READ      // This option is for ESP32 ONLY, tested with ST7789 and GC9A01 display only
+// #define TFT_SDA_READ      // This option is for ESP32 ONLY, tested with ST7789 display only
 
-// For ST7735, ST7789 and ILI9341 ONLY, define the colour order IF the blue and red are swapped on your display
+// For ST7789 and ILI9341 ONLY, define the colour order IF the blue and red are swapped on your display
 // Try ONE option at a time to find the correct colour order for your display
 
 //  #define TFT_RGB_ORDER TFT_RGB  // Colour order Red-Green-Blue
@@ -72,7 +59,7 @@
 
 // #define M5STACK
 
-// For ST7789, ST7735, ILI9163 and GC9A01 ONLY, define the pixel width and height in portrait orientation
+// For ST7789, ST7735 and ILI9163 ONLY, define the pixel width and height in portrait orientation
 // #define TFT_WIDTH  80
 // #define TFT_WIDTH  128
 // #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320
@@ -80,7 +67,6 @@
 // #define TFT_HEIGHT 128
 // #define TFT_HEIGHT 240 // ST7789 240 x 240
 // #define TFT_HEIGHT 320 // ST7789 240 x 320
-#define TFT_HEIGHT 240 // GC9A01 240 x 240
 
 // For ST7735 ONLY, define the type of display, originally this was based on the
 // colour of the tab on the screen protector film but this is not always true, so try
@@ -105,23 +91,19 @@
 // #define TFT_INVERSION_ON
 // #define TFT_INVERSION_OFF
 
-
-// ##################################################################################
-//
-// Section 2. Define the pins that are used to interface with the display here
-//
-// ##################################################################################
-
 // If a backlight control signal is available then define the TFT_BL pin in Section 2
 // below. The backlight will be turned ON when tft.begin() is called, but the library
 // needs to know if the LEDs are ON with the pin HIGH or LOW. If the LEDs are to be
 // driven with a PWM signal or turned OFF/ON then this must be handled by the user
 // sketch. e.g. with digitalWrite(TFT_BL, LOW);
 
-// #define TFT_BL   32            // LED back-light control pin
-// #define TFT_BACKLIGHT_ON HIGH  // Level to turn ON back-light (HIGH or LOW)
+// #define TFT_BACKLIGHT_ON HIGH  // HIGH or LOW are options
 
-
+// ##################################################################################
+//
+// Section 2. Define the pins that are used to interface with the display here
+//
+// ##################################################################################
 
 // We must use hardware SPI, a minimum of 3 GPIO pins is needed.
 // Typical setup for ESP8266 NodeMCU ESP-12 is :
@@ -138,7 +120,7 @@
 //
 // The TFT RESET pin can be connected to the NodeMCU RST pin or 3.3V to free up a control pin
 //
-// The DC (Data Command) pin may be labelled AO or RS (Register Select)
+// The DC (Data Command) pin may be labeled AO or RS (Register Select)
 //
 // With some displays such as the ILI9341 the TFT CS pin can be connected to GND if no more
 // SPI devices (e.g. an SD Card) are connected, in this case comment out the #define TFT_CS
@@ -172,7 +154,7 @@
 
 // Overlap mode shares the ESP8266 FLASH SPI bus with the TFT so has a performance impact
 // but saves pins for other functions. It is best not to connect MISO as some displays
-// do not tristate that line when chip select is high!
+// do not tristate that line wjen chip select is high!
 // On NodeMCU 1.0 SD0=MISO, SD1=MOSI, CLK=SCLK to connect to TFT in overlap mode
 // On NodeMCU V3  S0 =MISO, S1 =MOSI, S2 =SCLK
 // In ESP8266 overlap mode the following must be defined
@@ -199,15 +181,7 @@
 //#define TFT_RST   4  // Reset pin (could connect to RST pin)
 //#define TFT_RST  -1  // Set TFT_RST to -1 if display RESET is connected to ESP32 board RST
 
-// For ESP32 Dev board (only tested with GC9A01 display)
-// The hardware SPI can be mapped to any pins
-
-//#define TFT_MOSI 15 // In some display driver board, it might be written as "SDA" and so on.
-//#define TFT_SCLK 14
-//#define TFT_CS   5  // Chip select control pin
-//#define TFT_DC   27  // Data Command control pin
-//#define TFT_RST  33  // Reset pin (could connect to Arduino RESET pin)
-//#define TFT_BL   22  // LED back-light
+//#define TFT_BL   32  // LED back-light (only for ST7789 with backlight control pin)
 
 //#define TOUCH_CS 21     // Chip select pin (T_CS) of touch screen
 
@@ -229,11 +203,10 @@
 // Wemos D32 boards need to be modified, see diagram in Tools folder.
 // Only ILI9481 and ILI9341 based displays have been tested!
 
-// Parallel bus is only supported for the STM32 and ESP32
-// Example below is for ESP32 Parallel interface with UNO displays
+// Parallel bus is only supported on ESP32
+// Uncomment line below to use ESP32 Parallel interface instead of SPI
 
-// Tell the library to use 8 bit parallel mode (otherwise SPI is assumed)
-//#define TFT_PARALLEL_8_BIT
+//#define ESP32_PARALLEL
 
 // The ESP32 and TFT the pins used for testing are:
 //#define TFT_CS   33  // Chip select control pin (library pulls permanently low
@@ -252,31 +225,6 @@
 //#define TFT_D6   27
 //#define TFT_D7   14
 
-// ######       EDIT THE PINs BELOW TO SUIT YOUR STM32 SPI TFT SETUP        ######
-
-// The TFT can be connected to SPI port 1 or 2
-//#define TFT_SPI_PORT 1 // SPI port 1 maximum clock rate is 55MHz
-//#define TFT_MOSI PA7
-//#define TFT_MISO PA6
-//#define TFT_SCLK PA5
-
-//#define TFT_SPI_PORT 2 // SPI port 2 maximum clock rate is 27MHz
-//#define TFT_MOSI PB15
-//#define TFT_MISO PB14
-//#define TFT_SCLK PB13
-
-// Can use Ardiuno pin references, arbitrary allocation, TFT_eSPI controls chip select
-//#define TFT_CS   D5 // Chip select control pin to TFT CS
-//#define TFT_DC   D6 // Data Command control pin to TFT DC (may be labelled RS = Register Select)
-//#define TFT_RST  D7 // Reset pin to TFT RST (or RESET)
-// OR alternatively, we can use STM32 port reference names PXnn
-//#define TFT_CS   PE11 // Nucleo-F767ZI equivalent of D5
-//#define TFT_DC   PE9  // Nucleo-F767ZI equivalent of D6
-//#define TFT_RST  PF13 // Nucleo-F767ZI equivalent of D7
-
-//#define TFT_RST  -1   // Set TFT_RST to -1 if the display RESET is connected to processor reset
-                        // Use an Arduino pin for initial testing as connecting to processor reset
-                        // may not work (pulse too short at power up?)
 
 // ##################################################################################
 //
@@ -314,14 +262,14 @@
 // With an ILI9341 display 40MHz works OK, 80MHz sometimes fails
 // With a ST7735 display more than 27MHz may not work (spurious pixels and lines)
 // With an ILI9163 display 27 MHz works OK.
+// The RPi typically only works at 20MHz maximum.
 
 // #define SPI_FREQUENCY   1000000
 // #define SPI_FREQUENCY   5000000
 // #define SPI_FREQUENCY  10000000
 // #define SPI_FREQUENCY  20000000
-#define SPI_FREQUENCY  27000000
-// #define SPI_FREQUENCY  40000000
-// #define SPI_FREQUENCY  55000000 // STM32 SPI1 only (SPI2 maximum is 27MHz)
+#define SPI_FREQUENCY  27000000 // Actually sets it to 26.67MHz = 80/3
+// #define SPI_FREQUENCY  40000000 // Maximum to use SPIFFS
 // #define SPI_FREQUENCY  80000000
 
 // Optional reduced SPI frequency for reading TFT

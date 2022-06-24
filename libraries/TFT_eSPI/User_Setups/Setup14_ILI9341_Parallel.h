@@ -1,6 +1,6 @@
 // See SetupX_Template.h for all options available
 
-#define TFT_PARALLEL_8_BIT
+#define ESP32_PARALLEL
 
 
 #define ILI9341_DRIVER

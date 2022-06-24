@@ -2,25 +2,21 @@
   Arduino TFT graphics library targeted at ESP8266
   and ESP32 based boards.
 
-  This is a stand-alone library that contains the
+  This is a standalone library that contains the
   hardware driver, the graphics functions and the
   proportional fonts.
 
   The built-in fonts 4, 6, 7 and 8 are Run Length
   Encoded (RLE) to reduce the FLASH footprint.
 
-  Last review/edit by Bodmer: 21/04/21
+  Last review/edit by Bodmer: 26/01/20
  ****************************************************/
 
 // Stop fonts etc being loaded multiple times
 #ifndef _TFT_eSPIH_
 #define _TFT_eSPIH_
 
-#define TFT_ESPI_VERSION "2.3.70"
-
-// Bit level feature flags
-// Bit 0 set: viewport capability
-#define TFT_ESPI_FEATURES 1
+#define TFT_ESPI_VERSION "2.1.4"
 
 /***************************************************************************************
 **                         Section 1: Load required header files
@@ -39,20 +35,7 @@
 #include <User_Setup_Select.h>
 
 // Handle FLASH based storage e.g. PROGMEM
-#if defined(ARDUINO_ARCH_RP2040)
-  #undef pgm_read_byte
-  #define pgm_read_byte(addr)   (*(const unsigned char *)(addr))
-  #undef pgm_read_word
-  #define pgm_read_word(addr) ({ \
-    typeof(addr) _addr = (addr); \
-    *(const unsigned short *)(_addr); \
-  })
-  #undef pgm_read_dword
-  #define pgm_read_dword(addr) ({ \
-    typeof(addr) _addr = (addr); \
-    *(const unsigned long *)(_addr); \
-  })
-#elif defined(__AVR__)
+#ifdef __AVR__
   #include <avr/pgmspace.h>
 #elif defined(ESP8266) || defined(ESP32)
   #include <pgmspace.h>
@@ -67,8 +50,6 @@
   #include "Processors/TFT_eSPI_ESP8266.h"
 #elif defined (STM32)
   #include "Processors/TFT_eSPI_STM32.h"
-#elif defined(ARDUINO_ARCH_RP2040)
-  #include "Processors/TFT_eSPI_RP2040.h"
 #else
   #include "Processors/TFT_eSPI_Generic.h"
 #endif
@@ -100,10 +81,6 @@
 // If the XPT2046 SPI frequency is not defined, set a default
 #ifndef SPI_TOUCH_FREQUENCY
   #define SPI_TOUCH_FREQUENCY  2500000
-#endif
-
-#ifndef SPI_BUSY_CHECK
-  #define SPI_BUSY_CHECK
 #endif
 
 /***************************************************************************************
@@ -314,7 +291,7 @@ typedef struct
 {
 String  version = TFT_ESPI_VERSION;
 int32_t esp;         // Processor code
-uint8_t trans;       // SPI transaction support
+uint8_t trans;       // SPI transaction supoort
 uint8_t serial;      // Serial (SPI) or parallel
 uint8_t overlap;     // ESP8266 overlap mode
 
@@ -358,9 +335,6 @@ int8_t pin_tft_d5;
 int8_t pin_tft_d6;
 int8_t pin_tft_d7;
 
-int8_t pin_tft_led;
-int8_t pin_tft_led_on;
-
 int8_t pin_tch_cs;   // Touch chip select pin
 
 int16_t tft_spi_freq;// TFT write SPI frequency
@@ -379,7 +353,7 @@ swap_coord(T& a, T& b) { T t = a; a = b; b = t; }
 typedef uint16_t (*getColorCallback)(uint16_t x, uint16_t y);
 
 // Class functions and variables
-class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has access to protected members
+class TFT_eSPI : public Print {
 
  //--------------------------------------- public ------------------------------------//
  public:
@@ -412,17 +386,6 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
   // The TFT_eSprite class inherits the following functions (not all are useful to Sprite class
   void     setAddrWindow(int32_t xs, int32_t ys, int32_t w, int32_t h), // Note: start coordinates + width and height
            setWindow(int32_t xs, int32_t ys, int32_t xe, int32_t ye);   // Note: start + end coordinates
-
-  // Viewport commands, see "Viewport_Demo" sketch
-  void     setViewport(int32_t x, int32_t y, int32_t w, int32_t h, bool vpDatum = true);
-  bool     checkViewport(int32_t x, int32_t y, int32_t w, int32_t h);
-  int32_t  getViewportX(void);
-  int32_t  getViewportY(void);
-  int32_t  getViewportWidth(void);
-  int32_t  getViewportHeight(void);
-  bool     getViewportDatum(void);
-  void     frameViewport(uint16_t color, int32_t w);
-  void     resetViewport(void);
 
   // Push (aka write pixel) colours to the TFT (use setAddrWindow() first)
   void     pushColor(uint16_t color),
@@ -487,7 +450,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
            // The next functions can be used as a pair to copy screen blocks (or horizontal/vertical lines) to another location
            // Read a block of pixels to a data buffer, buffer is 16 bit and the size must be at least w * h
   void     readRect(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *data);
-           // Write a block of pixels to the screen which have been read by readRect()
+           // Write a block of pixels to the screen - this is a deprecated alternative to pushImage()
   void     pushRect(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *data);
 
            // These are used to render images or sprites stored in RAM arrays (used by Sprite class for 16bpp Sprites)
@@ -503,8 +466,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
            // Set bpp8 true for 8bpp sprites, false otherwise. The cmap pointer must be specified for 4bpp
   void     pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint8_t  *data, bool bpp8 = true, uint16_t *cmap = nullptr);
   void     pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint8_t  *data, uint8_t  transparent, bool bpp8 = true, uint16_t *cmap = nullptr);
-           // FLASH version
-  void     pushImage(int32_t x, int32_t y, int32_t w, int32_t h, const uint8_t *data, bool bpp8,  uint16_t *cmap = nullptr);
+
            // This next function has been used successfully to dump the TFT screen to a PC for documentation purposes
            // It reads a screen area and returns the 3 RGB 8 bit colour values of each pixel in the buffer
            // Set w and h to 1 to read 1 pixel's colour. The data buffer must be at least w * h * 3 bytes
@@ -521,9 +483,9 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
 
            // Handle char arrays
            // Use with setTextDatum() to position string on TFT, and setTextPadding() to blank old displayed strings
-           drawString(const char *string, int32_t x, int32_t y, uint8_t font),  // Draw string using specified font number
+           drawString(const char *string, int32_t x, int32_t y, uint8_t font),  // Draw string using specifed font number
            drawString(const char *string, int32_t x, int32_t y),                // Draw string using current font
-           drawString(const String& string, int32_t x, int32_t y, uint8_t font),// Draw string using specified font number
+           drawString(const String& string, int32_t x, int32_t y, uint8_t font),// Draw string using specifed font number
            drawString(const String& string, int32_t x, int32_t y),              // Draw string using current font
 
            drawCentreString(const char *string, int32_t x, int32_t y, uint8_t font),  // Deprecated, use setTextDatum() and drawString()
@@ -548,7 +510,6 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
   uint8_t  getTextDatum(void);
 
   void     setTextPadding(uint16_t x_width);                // Set text padding (background blanking/over-write) width in pixels
-  uint16_t getTextPadding(void);                            // Get text padding
 
 #ifdef LOAD_GFXFF
   void     setFreeFont(const GFXfont *f = NULL),            // Select the GFX Free Font
@@ -613,7 +574,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
   uint32_t alphaBlend24(uint8_t alpha, uint32_t fgc, uint32_t bgc, uint8_t dither = 0);
 
 
-  // DMA support functions - these are currently just for SPI writes when using the ESP32 or STM32 processors
+  // DMA support functions - these are currently just for SPI writes whe using the STM32 processors
            // Bear in mind DMA will only be of benefit in particular circumstances and can be tricky
            // to manage by noobs. The functions have however been designed to be noob friendly and
            // avoid a few DMA behaviour "gotchas".
@@ -628,7 +589,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
            // processor leaves a function or its content being changed while the DMA engine is reading it.
            //
            // The compiler MAY change the implied scope of a buffer which has been set aside by creating
-           // an array. For example a buffer defined before a "for-next" loop may get de-allocated when
+           // and an array. For example a buffer defined before a "for-next" loop may get de-allocated when
            // the loop ends. To avoid this use, for example, malloc() and free() to take control of when
            // the buffer space is available and ensure it is not released until DMA is complete.
            //
@@ -638,14 +599,12 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
            // function will wait for the DMA to complete, so this may defeat any DMA performance benefit.
            //
 
-  bool     initDMA(bool ctrl_cs = false);  // Initialise the DMA engine and attach to SPI bus - typically used in setup()
-                                           // Parameter "true" enables DMA engine control of TFT chip select (ESP32 only)
-                                           // For ESP32 only, TFT reads will not work if parameter is true
+  bool     initDMA(void);     // Initialise the DMA engine and attach to SPI bus - typically used in setup()
   void     deInitDMA(void);   // De-initialise the DMA engine and detach from SPI bus - typically not used
   
            // Push an image to the TFT using DMA, buffer is optional and grabs (double buffers) a copy of the image
            // Use the buffer if the image data will get over-written or destroyed while DMA is in progress
-           // If swapping colour bytes is defined, and the double buffer option is NOT used, then the bytes
+           // If swapping colour bytes is defined, and the double buffer option is NOT used then the bytes
            // in the original data image will be swapped by the function before DMA is initiated.
            // The function will wait for the last DMA to complete if it is called while a previous DMA is still
            // in progress, this simplifies the sketch and helps avoid "gotchas".
@@ -655,11 +614,10 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
   void     pushPixelsDMA(uint16_t* image, uint32_t len);
 
            // Check if the DMA is complete - use while(tft.dmaBusy); for a blocking wait
-  bool     dmaBusy(void); // returns true if DMA is still in progress
-  void     dmaWait(void); // wait until DMA is complete
+  bool     dmaBusy(void);
 
-  bool     DMA_Enabled = false;   // Flag for DMA enabled state
-  uint8_t  spiBusyCheck = 0;      // Number of ESP32 transfer buffers to check
+  bool     DMA_Enabled = false; // Flag for DMA enabled state
+
 
   // Bare metal functions
   void     startWrite(void);                         // Begin SPI transaction
@@ -668,7 +626,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
 
   // Set/get an arbitrary library configuration attribute or option
   //       Use to switch ON/OFF capabilities such as UTF8 decoding - each attribute has a unique ID
-  //       id = 0: reserved - may be used in future to reset all attributes to a default state
+  //       id = 0: reserved - may be used in fuuture to reset all attributes to a default state
   //       id = 1: Turn on (a=true) or off (a=false) GLCD cp437 font character error correction
   //       id = 2: Turn on (a=true) or off (a=false) UTF8 decoding
   //       id = 3: Enable or disable use of ESP32 PSRAM (if available)
@@ -684,6 +642,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
   // Global variables
   static   SPIClass& getSPIinstance(void); // Get SPI class handle
 
+  int32_t  cursor_x, cursor_y, padX;       // Text cursor x,y and padding setting
   uint32_t textcolor, textbgcolor;         // Text foreground and background colours
 
   uint32_t bitmap_fg, bitmap_bg;           // Bitmap foreground (bit=1) and background (bit=0) colours
@@ -692,6 +651,9 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
            textsize,  // Current font size multiplier
            textdatum, // Text reference datum
            rotation;  // Display rotation (0-3)
+
+  int16_t  _xpivot;   // TFT x pivot point coordinate for rotated Sprites
+  int16_t  _ypivot;   // TFT x pivot point coordinate for rotated Sprites
 
   uint8_t  decoderState = 0;   // UTF8 decoder state        - not for user access
   uint16_t decoderBuffer;      // Unicode code-point buffer - not for user access
@@ -708,13 +670,13 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
            // New begin and end prototypes
            // begin/end a TFT write transaction
            // For SPI bus the transmit clock rate is set
-  inline void begin_tft_write() __attribute__((always_inline));
-  inline void end_tft_write()   __attribute__((always_inline));
+  inline void begin_tft_write()      __attribute__((always_inline));
+  inline void end_tft_write()        __attribute__((always_inline));
 
            // begin/end a TFT read transaction
            // For SPI bus: begin lowers SPI clock rate, end reinstates transmit clock rate
-  inline void begin_tft_read()  __attribute__((always_inline));
-  inline void end_tft_read()    __attribute__((always_inline));
+  inline void begin_tft_read() __attribute__((always_inline));
+  inline void end_tft_read()   __attribute__((always_inline));
 
            // Temporary  library development function  TODO: remove need for this
   void     pushSwapBytePixels(const void* data_in, uint32_t len);
@@ -761,20 +723,6 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
   int32_t  _width, _height;           // Display w/h as modified by current rotation
   int32_t  addr_row, addr_col;        // Window position - used to minimise window commands
 
-  int16_t  _xPivot;   // TFT x pivot point coordinate for rotated Sprites
-  int16_t  _yPivot;   // TFT x pivot point coordinate for rotated Sprites
-
-  // Viewport variables
-  int32_t  _vpX, _vpY, _vpW, _vpH;    // Note: x start, y start, x end + 1, y end + 1
-  int32_t  _xDatum;
-  int32_t  _yDatum;
-  int32_t  _xWidth;
-  int32_t  _yHeight;
-  bool     _vpDatum;
-  bool     _vpOoB;
-
-  int32_t  cursor_x, cursor_y, padX;       // Text cursor x,y and padding setting
-
   uint32_t fontsloaded;               // Bit field of fonts loaded
 
   uint8_t  glyph_ab,   // Smooth font glyph delta Y (height) above baseline
@@ -783,7 +731,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
   bool     isDigits;   // adjust bounding box for numbers to reduce visual jiggling
   bool     textwrapX, textwrapY;  // If set, 'wrap' text at right and optionally bottom edge of display
   bool     _swapBytes; // Swap the byte order for TFT pushImage()
-  bool     locked, inTransaction, lockTransaction; // SPI transaction and mutex lock flags
+  bool     locked, inTransaction; // SPI transaction and mutex lock flags
 
   bool     _booted;    // init() or begin() has already run once
   
