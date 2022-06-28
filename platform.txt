@@ -6,7 +6,7 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
 name=CircuitMess ESP8266 Boards
-version=1.0.0
+version=1.2.0
 # Based on espressif esp8266 2.7.1
 
 # These will be removed by the packager script when doing a JSON release
