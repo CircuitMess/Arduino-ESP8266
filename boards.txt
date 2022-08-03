@@ -216,7 +216,7 @@ nibble.build.defines=-DCIRCUITOS_LITTLEFS -DCIRCUITOS_TONE -DCIRCUITOS_LOWRAM -D
 nibble.build.extra_flags=-Os -g
 
 nibble.bootloader.tool=firmburn
-nibble.bootloader.tool.firmware=nibble/nibble-v1.1.0.bin
+nibble.bootloader.tool.firmware=nibble/nibble-v1.1.1.bin
 
 ####################################################################3
 
